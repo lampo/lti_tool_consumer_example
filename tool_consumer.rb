@@ -18,6 +18,7 @@ post '/set_name' do
 end
 
 get '/tool_config' do
+  session['username'] = 'Scott'
   unless session['username']
     redirect to('/')
     return
@@ -35,7 +36,6 @@ post '/tool_launch' do
   end
 
   tc = IMS::LTI::ToolConfig.new(:title => params['tool_name'], :launch_url => params['launch_url'])
-  tc.set_custom_param('message_from_sinatra', 'hey from the sinatra example consumer')
   @consumer = IMS::LTI::ToolConsumer.new(params['consumer_key'], params['consumer_secret'])
   @consumer.set_config(tc)
 
@@ -45,8 +45,11 @@ post '/tool_launch' do
   # Only this first one is required, the rest are recommended
   @consumer.resource_link_id = "thisisuniquetome"
   @consumer.launch_presentation_return_url = host + '/tool_return'
-  @consumer.lis_person_name_given = session['username']
-  @consumer.user_id = Digest::MD5.hexdigest(session['username'])
+  @consumer.lis_person_name_given = 'Scott'
+  @consumer.lis_person_contact_email_primary = 'lti_user@example.com'
+  @consumer.lis_person_name_family = 'lastName'
+  @consumer.lis_person_name_given = 'firstName'
+  @consumer.user_id = Digest::MD5.hexdigest('Scott')
   @consumer.roles = "learner"
   @consumer.context_id = "bestcourseever"
   @consumer.context_title = "Example Sinatra Tool Consumer"
